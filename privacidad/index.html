@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Política de privacidad — Lista Criolla</title>
-  <meta name="description" content="Política de privacidad de Lista Criolla: app local-first de listas. Sin cuenta, sin analytics, sin IA activa. QE-02 Auto Backup en revisión." />
+  <meta name="description" content="Política de privacidad de Lista Criolla: app local-first de listas. Sin cuenta, sin analytics, sin IA activa. Auto Backup ON: backup del sistema en tu cuenta; el desarrollador no accede." />
   <meta property="og:title" content="Privacidad — Lista Criolla" />
   <meta property="og:description" content="Local-first, sin cuenta, sin analytics. Tus listas en tu teléfono. Backup del sistema en revisión." />
   <meta property="og:type" content="website" />
@@ -25,7 +25,7 @@
 
   <main id="contenido" class="page">
     <h1>Política de privacidad</h1>
-    <p class="meta">Versión 1.3.3 (PRIV-12 · marca Lista Criolla · contacto hola@listacriolla.app · QE-02 en revisión) · Español (Argentina)<br />
+    <p class="meta">Versión 1.6 (PRIV-12 · marca Lista Criolla · Auto Backup ON · hola@listacriolla.app) · Español (Argentina)<br />
       Vigencia: 9 de octubre de 2026<br />
       App: Lista Criolla · package <code>app.proyectoorden.listacriolla</code><br />
       URL pública (candidata, aún no publicada): <code>https://listacriolla.app/privacidad/</code></p>
@@ -60,7 +60,7 @@
         <tr><td>¿Hay agente de IA?</td><td><strong>No.</strong> La opción aparece como <em>Próximamente</em>; no envía tus documentos a ningún modelo.</td></tr>
         <tr><td>¿Cobros / compras in-app?</td><td><strong>No</strong> en esta versión. La app se ofrece para <strong>descarga gratuita</strong>.</td></tr>
         <tr><td>¿Analytics o publicidad?</td><td><strong>No.</strong></td></tr>
-        <tr><td>¿Backup automático del sistema (Auto Backup / iCloud de la app)?</td><td><strong>En revisión (QE-02).</strong> Aún no hay decisión final. Mientras tanto podés <strong>exportar</strong> tus listas (JSON) desde la app. Esta sección se actualizará al cerrar QE-02.</td></tr>
+                <tr><td>¿Backup automático del sistema (Auto Backup / iCloud de la app)?</td><td><strong>Sí (ON).</strong> El sistema puede respaldar datos de la app en <strong>tu</strong> cuenta Google o Apple, según tus ajustes. <strong>Nosotros no accedemos</strong> a ese backup. También podés <strong>exportar</strong> JSON.</td></tr>
       </tbody>
     </table>
 
@@ -91,30 +91,20 @@
       <li>Las tareas que <strong>vos confirmás</strong> sí se guardan en la lista local de la app (en el teléfono).</li>
     </ul>
 
-    <h2>6. Copias de seguridad del sistema — QE-02 en revisión</h2>
+        <h2>6. Copias de seguridad del sistema — ON</h2>
     <div class="panel">
-      La decisión de incluir o no los datos de la app en Android Auto Backup / backup de iOS
-      está <strong>abierta</strong>. No tratar “OFF” ni “ON” como decisión final.
-      Al cerrarla actualizaremos esta sección y las declaraciones de las tiendas.
+      La app <strong>permite</strong> que el sistema operativo incluya sus datos en la copia de seguridad del dispositivo
+      (Android Auto Backup / backup de la app en iOS·iCloud) si esa función está activa en tus ajustes.
+      Ese respaldo vive en <strong>tu cuenta</strong> Google o Apple. <strong>El desarrollador no accede</strong> a esos backups.
     </div>
-    <p><strong>Mientras tanto (válido ya):</strong></p>
     <ul>
-      <li>Tus listas viven en el <strong>almacenamiento local</strong> de la app.</li>
-      <li>Podés <strong>exportar</strong> tus listas (por ejemplo JSON) y guardarlas o compartirlas vos; el destino lo elegís vos.</li>
-      <li>Sigue pudiendo salir del teléfono lo que <strong>vos iniciás</strong> (petición a Google al importar un Doc público, o un enlace que abrís).</li>
+      <li>No es una nube nuestra: no vemos, no descargamos ni administramos ese backup.</li>
+      <li>Por eso no afirmamos que “nunca nada sale del teléfono” si tenés el backup del OS activado.</li>
+      <li>Gestioná o borrá respaldos desde los ajustes de tu cuenta Google o Apple.</li>
+      <li>También podés <strong>exportar</strong> JSON. Puede salir del teléfono lo que iniciás vos (Doc público o un enlace).</li>
     </ul>
-    <p><strong>Cuando QE-02 se cierre, una de estas dos redacciones quedará:</strong></p>
-    <table>
-      <thead>
-        <tr><th>Si OFF</th><th>Si ON</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>La app <strong>no</strong> entra al Auto Backup del sistema; el respaldo lo hacés vos con export.</td>
-          <td>El sistema <strong>puede</strong> incluir datos de la app en el backup de tu cuenta Google/Apple; no es una nube nuestra, pero no es “nunca sale del teléfono”.</td>
-        </tr>
-      </tbody>
-    </table>
+
+
 
     <h2>7. Agente de IA — Próximamente</h2>
     <p>En la interfaz puede aparecer una opción de análisis o agente con IA marcada como <em>Próximamente</em>.</p>
@@ -140,7 +130,7 @@
       <tbody>
         <tr><td>Leés un Google Doc vía la app</td><td><strong>Google</strong> (su servicio de Docs / exportación)</td></tr>
         <tr><td>Abrís un enlace de una tarea</td><td>El sitio o app de destino que elijas</td></tr>
-        <tr><td>Backup automático de la app</td><td><strong>QE-02 en revisión</strong> — ON u OFF pendiente; ver §6</td></tr>
+                <tr><td>Backup automático de la app</td><td><strong>Google</strong> (Android Auto Backup) o <strong>Apple</strong> (iOS/iCloud), según tus ajustes — ver §6. Nosotros <strong>no</strong> accedemos</td></tr>
         <tr><td>Descargás la app</td><td><strong>Google Play</strong> o <strong>App Store</strong> (sus propias políticas)</td></tr>
       </tbody>
     </table>
@@ -149,7 +139,7 @@
     <h2>11. Conservación y borrado</h2>
     <ul>
       <li>Mientras la app esté instalada, tus listas viven en el almacenamiento local.</li>
-      <li>Si desinstalás la app, el sistema elimina los datos locales de la app. Si en el futuro QE-02 quedara ON, podría existir copia en el backup del sistema según tus ajustes; si queda OFF, no por ese canal.</li>
+      <li>Si desinstalás la app, el sistema elimina los datos locales de la app. Puede quedar una copia en el <strong>backup del sistema</strong> (tu cuenta Google/Apple) según tus ajustes; nosotros no accedemos a esa copia.</li>
       <li>Si exportaste un JSON, ese archivo sigue donde vos lo hayas guardado.</li>
       <li>Si la app ofrece <strong>borrar todos los datos</strong> desde Ajustes, eso limpia el contenido local de Lista Criolla en ese dispositivo.</li>
       <li>No operamos un panel de “borrar mi cuenta en la nube” porque <strong>no hay cuenta en la nube</strong>.</li>
