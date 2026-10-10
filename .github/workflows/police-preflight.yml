@@ -1,0 +1,73 @@
+# Police Preflight del sitio estático. No usa Flutter.
+# Sintaxis = HTML UTF-8 con title. Build de comprobación = el propio archivo
+# publicado (index + privacidad). No hay suite unitaria en este repo.
+name: Police Preflight
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: police-preflight-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    name: Police Preflight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: ¿Hay PR abierto?
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          n=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "${GITHUB_REF_NAME}" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$n" ]; then
+            echo "has_pr=false" >> "$GITHUB_OUTPUT"
+            echo "Sin PR abierto para ${GITHUB_REF_NAME}. Police Preflight no corre."
+            exit 0
+          fi
+          echo "has_pr=true" >> "$GITHUB_OUTPUT"
+          echo "number=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Chequeos
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
+          set -eu
+          : > "$RUNNER_TEMP/police-preflight.md"
+          sh tool/police/list_push_commits.sh \
+            "${{ github.event.before }}" \
+            "${{ github.event.after }}" \
+            "origin/${{ github.event.repository.default_branch }}" \
+            > "$RUNNER_TEMP/commits.txt"
+          python3 tool/police/commit_hygiene.py \
+            --commits-file "$RUNNER_TEMP/commits.txt" \
+            --branch "${GITHUB_REF_NAME}" \
+            >> "$RUNNER_TEMP/police-preflight.md"
+          python3 tool/police/secret_scan.py \
+            --commits-file "$RUNNER_TEMP/commits.txt" \
+            >> "$RUNNER_TEMP/police-preflight.md"
+          python3 tool/police/static_check.py \
+            >> "$RUNNER_TEMP/police-preflight.md"
+
+      - name: Comentar en el PR
+        if: steps.pr.outputs.has_pr == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tool/police/post_findings.py \
+            --name "Police Preflight" \
+            --file "$RUNNER_TEMP/police-preflight.md" \
+            --pr "${{ steps.pr.outputs.number }}"
