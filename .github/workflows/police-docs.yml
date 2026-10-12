@@ -1,0 +1,65 @@
+# Police Docs del sitio. Perfil web: privacidad sin README es blocker.
+name: Police Docs
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: police-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: Police Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: ¿Hay PR abierto?
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          n=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "${GITHUB_REF_NAME}" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$n" ]; then
+            echo "has_pr=false" >> "$GITHUB_OUTPUT"
+            echo "Sin PR abierto para ${GITHUB_REF_NAME}. Police Docs no corre."
+            exit 0
+          fi
+          echo "has_pr=true" >> "$GITHUB_OUTPUT"
+          echo "number=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Revisar cada commit
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
+          set -eu
+          sh tool/police/list_push_commits.sh \
+            "${{ github.event.before }}" \
+            "${{ github.event.after }}" \
+            "origin/${{ github.event.repository.default_branch }}" \
+            > "$RUNNER_TEMP/commits.txt"
+          python3 tool/police/docs_audit.py \
+            --profile web \
+            --commits-file "$RUNNER_TEMP/commits.txt" \
+            > "$RUNNER_TEMP/police-docs.md"
+
+      - name: Comentar en el PR
+        if: steps.pr.outputs.has_pr == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tool/police/post_findings.py \
+            --name "Police Docs" \
+            --file "$RUNNER_TEMP/police-docs.md" \
+            --pr "${{ steps.pr.outputs.number }}"
