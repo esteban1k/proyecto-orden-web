@@ -16,11 +16,11 @@ Sitio público de **Lista Criolla** (GitHub Pages + `listacriolla.app`).
 
 ## Contenido (rama `site/que-hace`)
 
-- **`/`** — Qué hace la app (listas, tareas, calma, local-first), quote del creador, galería con capturas reales en `assets/img/screens/`.
+- **`/`** — Qué hace la app (listas, tareas, calma, local-first), quote del creador, galería con capturas recortadas en `assets/img/screens/site-*.png` (origen store `media/site-2026-11-04/`).
 - **`/privacidad/`** — Política v1.7 / app 1.0.0; avisos de resumen y vencimiento programados en el teléfono (no se envían a servidores nuestros).
 - **Crédito** — Sitio desarrollado por **Esteban Martín** → `https://emartin.com.ar` (footer inicio + privacidad).
 
-Capturas actualizadas pendientes: se agregarán desde el store (`media/site-2026-11-04/`) en el mismo PR antes del merge.
+Capturas actualizadas: `assets/img/screens/site-*.png` (store `media/site-2026-11-04/`, ventana recortada). Pendiente merge del PR.
 
 ## Dominios (301)
 
