@@ -1,4 +1,4 @@
-# Police Docs — híbrido: perfiles app + web + qa (web-next kit) en commits del push.
+# Police Docs — web profile. Install via packages/police-kit/install.sh web
 name: Police Docs
 
 on:
@@ -34,13 +34,12 @@ jobs:
           n=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "${GITHUB_REF_NAME}" --state open --json number --jq '.[0].number // empty')
           if [ -z "$n" ]; then
             echo "has_pr=false" >> "$GITHUB_OUTPUT"
-            echo "Sin PR abierto para ${GITHUB_REF_NAME}. Police Docs no corre."
             exit 0
           fi
           echo "has_pr=true" >> "$GITHUB_OUTPUT"
           echo "number=$n" >> "$GITHUB_OUTPUT"
 
-      - name: Revisar cada commit (app, web, qa)
+      - name: Revisar cada commit
         if: steps.pr.outputs.has_pr == 'true'
         run: |
           set -eu
@@ -49,13 +48,10 @@ jobs:
             "${{ github.event.after }}" \
             "origin/${{ github.event.repository.default_branch }}" \
             > "$RUNNER_TEMP/commits.txt"
-          : > "$RUNNER_TEMP/police-docs.md"
-          for PROFILE in app web qa; do
-            python3 tool/police/docs_audit.py \
-              --profile "$PROFILE" \
-              --commits-file "$RUNNER_TEMP/commits.txt" \
-              >> "$RUNNER_TEMP/police-docs.md"
-          done
+          python3 tool/police/docs_audit.py \
+            --profile web \
+            --commits-file "$RUNNER_TEMP/commits.txt" \
+            > "$RUNNER_TEMP/police-docs.md"
 
       - name: Comentar en el PR
         if: steps.pr.outputs.has_pr == 'true'
