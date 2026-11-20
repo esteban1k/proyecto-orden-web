@@ -44,7 +44,7 @@ python3 -m http.server 8080
 | **Police Preflight** | push a ramas ≠ `main` (PR abierto) | hygiene, secret scan, static check → comentario en PR |
 | **Police Docs** | push a ramas ≠ `main` (PR abierto) | docs vs cambios en `index.html` / `privacidad/` → comentario en PR |
 
-Perfil **web** (sin Flutter): ver `tool/police/`. Espejo de reglas en el repo app `esteban1k/proyecto-orden`.
+Perfil **web** (sin Flutter): ver `tool/police/`. Espejo de reglas en el repo app `esteban1k/proyecto-orden-mobile`.
 
 ## GitHub Pages
 
@@ -57,4 +57,4 @@ Archivos listos: `CNAME`, `.nojekyll`, canónicas, `sitemap.xml`, `robots.txt`.
 
 ## Relación con la app
 
-Solo sitio estático. App: `esteban1k/proyecto-orden` (no se toca desde aquí).
+Solo sitio estático. App: `esteban1k/proyecto-orden-mobile` (no se toca desde aquí).
