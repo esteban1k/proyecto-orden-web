@@ -35,9 +35,37 @@ npm run build  # genera out/
 - `/verify-email/` — OTP 6 dígitos (en local, el código sale en el log del API)
 - `/listas/` — stub protegido por sesión (M2 sync)
 
-## Sesión y CSP
+## Sesión, XSS y camino a producción
 
-El export estático no puede emitir cookies `HttpOnly`. La sesión (`lc_web_session`) vive en `localStorage`: cualquier XSS en el origen la lee. Mitigaciones de este milestone: no renderizar texto del API, validar el token antes de guardarlo, CSP por meta tag (`script-src 'self' 'unsafe-inline'` porque Next hidrata con scripts inline) y redirect de Google solo a `https://accounts.google.com/o/oauth2/`. `frame-ancestors` en un meta tag no lo aplica el browser; el host de `app.listacriolla.app` tiene que mandarlo por header.
+### M1 — token en `localStorage` (deliberado)
+
+`writeSession()` guarda el JSON de sesión bajo la clave `lc_web_session` en **`localStorage`**. En un export estático no hay servidor que pueda fijar cookies **`HttpOnly`** en el login; el browser tiene que conservar el `session_token` del lado cliente.
+
+**Superficie XSS:** un script inyectado en el mismo origen (p. ej. fallo de sanitización, dependencia comprometida, `unsafe-inline` en CSP) puede llamar `localStorage.getItem('lc_web_session')` y exfiltrar el token. Eso equivale a robo de sesión hasta el `expires_at` del API.
+
+**Mitigaciones en M1 (no sustituyen HttpOnly):**
+
+- Validación estricta antes de persistir (`parseSession`, token ASCII imprimible, caducidad).
+- No renderizar HTML crudo de la API en React.
+- CSP por meta tag en el layout (`src/lib/csp.ts`); `connect-src` acotado al API.
+- OAuth: navegación solo a `https://accounts.google.com/o/oauth2/` (`urlSafety.ts`).
+
+**Antes de tratar auth como “producción lista”** hay que cerrar la brecha de almacenamiento del token (ver abajo).
+
+### Camino planificado — cookies `HttpOnly` (post–M1)
+
+Cuando la app deje de ser solo `output: 'export'` y corra detrás de un origen con servidor (Next en modo servidor, o reverse proxy):
+
+1. Tras login/register/verify, el **API o BFF** responde con `Set-Cookie`: `session=…; HttpOnly; Secure; SameSite=Lax` (o `Strict` si el flujo lo permite).
+2. El cliente **deja de** guardar `session_token` en `localStorage`; las llamadas autenticadas usan cookie (`credentials: 'include'`) o el BFF adjunta la cookie al upstream.
+3. Eliminar/migrar `lc_web_session` al arrancar la nueva versión para no dejar tokens huérfanos en disco.
+4. Endurecer CSP: quitar `'unsafe-inline'` donde Next lo permita (nonces o build sin inline), y fijar `frame-ancestors` por **header** en el host (`app.listacriolla.app`).
+
+Hasta ese cambio, M1 es aceptable para desarrollo y demos con API local, no para datos sensibles en producción abierta.
+
+### CSP (marketing vs app)
+
+`frame-ancestors` en un **meta tag** no lo aplica el browser; el host del deploy tiene que enviarlo por header. En Pages del marketing raíz la CSP es scriptless; en `app/` Next requiere scripts inline para hidratar.
 
 ## CI
 

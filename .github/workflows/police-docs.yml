@@ -1,4 +1,4 @@
-# Police Docs del sitio. Perfil web: privacidad sin README es blocker.
+# Police Docs — híbrido: perfiles app + web + qa (web-next kit) en commits del push.
 name: Police Docs
 
 on:
@@ -40,7 +40,7 @@ jobs:
           echo "has_pr=true" >> "$GITHUB_OUTPUT"
           echo "number=$n" >> "$GITHUB_OUTPUT"
 
-      - name: Revisar cada commit
+      - name: Revisar cada commit (app, web, qa)
         if: steps.pr.outputs.has_pr == 'true'
         run: |
           set -eu
@@ -49,10 +49,13 @@ jobs:
             "${{ github.event.after }}" \
             "origin/${{ github.event.repository.default_branch }}" \
             > "$RUNNER_TEMP/commits.txt"
-          python3 tool/police/docs_audit.py \
-            --profile web \
-            --commits-file "$RUNNER_TEMP/commits.txt" \
-            > "$RUNNER_TEMP/police-docs.md"
+          : > "$RUNNER_TEMP/police-docs.md"
+          for PROFILE in app web qa; do
+            python3 tool/police/docs_audit.py \
+              --profile "$PROFILE" \
+              --commits-file "$RUNNER_TEMP/commits.txt" \
+              >> "$RUNNER_TEMP/police-docs.md"
+          done
 
       - name: Comentar en el PR
         if: steps.pr.outputs.has_pr == 'true'

@@ -42,10 +42,10 @@ python3 -m http.server 8080
 | Workflow | Cuándo | Qué hace |
 |---|---|---|
 | **CI** | `pull_request` | `static_check.py` (HTML UTF-8, títulos, CSP) y job `web-app` (Node 22) |
-| **Police Preflight** | push a ramas ≠ `main` (PR abierto) | hygiene, secret scan, static check → comentario en PR |
-| **Police Docs** | push a ramas ≠ `main` (PR abierto) | docs vs cambios en `index.html` / `privacidad/` → comentario en PR |
+| **Police Preflight** | push a ramas ≠ `main` (PR abierto) | **web:** hygiene, secrets, `static_check.py`. **web-next** (si el push toca `app/`): `npm ci`, `build`, `lint` en `app/` → comentario en PR |
+| **Police Docs** | push a ramas ≠ `main` (PR abierto) | perfiles `app`, `web`, `qa` en los commits del push → comentario en PR |
 
-Perfil **web** (sin Flutter): ver `tool/police/`. Espejo de reglas en el repo app `esteban1k/proyecto-orden-mobile`.
+Perfiles alineados con [Police Kit `web-next`](https://github.com/esteban1k/proyecto-qa/tree/main/packages/police-kit/workflows/web-next). Sesión M1 y riesgo XSS: `app/README.md` (sección *Sesión, XSS y camino a producción*).
 
 ## GitHub Pages
 
