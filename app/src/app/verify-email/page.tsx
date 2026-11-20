@@ -20,7 +20,7 @@ function VerifyEmailForm() {
 
   useEffect(() => {
     const fromQuery = searchParams.get("email");
-    if (fromQuery) setEmail(fromQuery);
+    if (fromQuery && fromQuery.length <= 254) setEmail(fromQuery);
   }, [searchParams]);
 
   async function onVerify(e: FormEvent) {
@@ -28,14 +28,19 @@ function VerifyEmailForm() {
     setError(null);
     setBusy(true);
     try {
-      await verifyEmail(email.trim(), code.trim());
+      const otp = code.trim();
+      if (!/^\d{6}$/.test(otp)) {
+        setError(t("errors.invalid_otp"));
+        return;
+      }
+      await verifyEmail(email.trim(), otp);
       if (password.trim()) {
         const session = await login(email.trim(), password);
         writeSession(session);
         router.push("/listas/");
         return;
       }
-      setInfo("Correo verificado. Ingresá con tu contraseña.");
+      setInfo(t("verify.verified"));
       router.push("/login/");
     } catch (err) {
       setError(userFacingError(err));
@@ -79,6 +84,7 @@ function VerifyEmailForm() {
           <input
             type="text"
             inputMode="numeric"
+            autoComplete="one-time-code"
             pattern="[0-9]{6}"
             maxLength={6}
             required
@@ -88,7 +94,7 @@ function VerifyEmailForm() {
           />
         </label>
         <label className="block space-y-1 text-sm">
-          <span>{t("login.password")} (opcional, para entrar al verificar)</span>
+          <span>{t("verify.passwordOptional")}</span>
           <input
             type="password"
             minLength={8}

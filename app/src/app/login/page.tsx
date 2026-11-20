@@ -5,13 +5,10 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { t } from "@/i18n";
 import { ApiError } from "@/lib/api/client";
-import {
-  googleStart,
-  login,
-  register,
-} from "@/lib/api/auth";
+import { googleStart, login, register } from "@/lib/api/auth";
 import { userFacingError } from "@/lib/errors";
 import { writeSession } from "@/lib/session";
+import { isAllowedGoogleRedirect } from "@/lib/urlSafety";
 
 type Mode = "login" | "register";
 
@@ -60,15 +57,11 @@ export default function LoginPage() {
     setBusy(true);
     try {
       const res = await googleStart();
-      if (res.status === "redirect" && res.url) {
-        window.location.href = res.url;
+      if (res.status === "redirect" && isAllowedGoogleRedirect(res.url)) {
+        window.location.assign(res.url);
         return;
       }
-      if (res.status === "stub") {
-        setInfo(res.message);
-        return;
-      }
-      window.location.href = `/v1/auth/google/start?device_label=${encodeURIComponent("Lista Criolla Web")}`;
+      setInfo(t("login.googleUnavailable"));
     } catch (err) {
       setError(userFacingError(err));
     } finally {

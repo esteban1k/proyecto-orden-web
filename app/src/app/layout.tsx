@@ -1,22 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { locale } from "@/i18n";
 import { AppShell } from "@/components/AppShell";
+import { appCsp } from "@/lib/csp";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Lista Criolla",
   description: "App web local — listas con cuenta (RFC v1)",
+  referrer: "strict-origin-when-cross-origin",
 };
 
 export default function RootLayout({
@@ -26,9 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang={locale}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <meta httpEquiv="Content-Security-Policy" content={appCsp()} />
+      </head>
+      <body className="antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

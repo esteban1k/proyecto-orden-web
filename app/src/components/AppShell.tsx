@@ -2,15 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { t } from "@/i18n";
 import { logout as apiLogout } from "@/lib/api/auth";
-import {
-  clearSession,
-  isSessionValid,
-  readSession,
-  type SessionPayload,
-} from "@/lib/session";
+import { clearSession, isSessionValid, readSession } from "@/lib/session";
+import { useSession } from "@/components/useSession";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -19,27 +15,22 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [session, setSession] = useState<SessionPayload | null>(null);
-
-  useEffect(() => {
-    setSession(readSession());
-  }, [pathname]);
+  const { ready, session } = useSession();
 
   const handleLogout = useCallback(async () => {
     const current = readSession();
+    clearSession();
     if (current?.session_token) {
       try {
         await apiLogout(current.session_token);
       } catch {
-        /* still clear local session */
+        /* local session already cleared */
       }
     }
-    clearSession();
-    setSession(null);
     router.push("/login/");
   }, [router]);
 
-  const loggedIn = isSessionValid(session);
+  const loggedIn = ready && isSessionValid(session);
 
   return (
     <div className="min-h-screen flex flex-col bg-stone-50 text-stone-900">

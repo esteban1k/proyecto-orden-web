@@ -1,5 +1,6 @@
-import { apiFetch, apiUrl } from "./client";
+import { ApiError, apiFetch } from "./client";
 import type { SessionPayload } from "../session";
+import { isAllowedGoogleRedirect } from "../urlSafety";
 
 export type RegisterResponse = {
   user_id: string;
@@ -72,13 +73,22 @@ export async function logout(sessionToken: string): Promise<void> {
 }
 
 export async function googleStart(): Promise<GoogleStartResponse> {
-  return apiFetch<GoogleStartResponse>(
+  const res = await apiFetch<GoogleStartResponse>(
     `/v1/auth/google/start?redirect=json&device_label=${encodeURIComponent(deviceLabel())}`,
   );
-}
-
-export function googleStartUrl(): string {
-  return apiUrl(
-    `/v1/auth/google/start?device_label=${encodeURIComponent(deviceLabel())}`,
-  );
+  if (
+    res &&
+    typeof res === "object" &&
+    "status" in res &&
+    res.status === "redirect" &&
+    "url" in res &&
+    typeof res.url === "string" &&
+    isAllowedGoogleRedirect(res.url)
+  ) {
+    return { status: "redirect", url: res.url };
+  }
+  if (res && typeof res === "object" && "status" in res && res.status === "stub") {
+    return { status: "stub", message: "", start_url: null };
+  }
+  throw new ApiError(0, "generic");
 }
