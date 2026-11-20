@@ -5,8 +5,7 @@ Sitio público de **Lista Criolla** (GitHub Pages + `listacriolla.app`).
 | Campo | Valor |
 |---|---|
 | Repo | `esteban1k/proyecto-orden-web` |
-| Rama `main` (live) | Landing **Próximamente** + política `/privacidad/` hasta merge del PR de sitio |
-| Rama de trabajo | `site/que-hace` → [PR #2](https://github.com/esteban1k/proyecto-orden-web/pull/2): landing «qué hace», capturas walkthrough, crédito [Esteban Martín](https://emartin.com.ar), privacidad con avisos locales (versión app **1.0.0**) |
+| Rama `main` (live) | Landing «qué hace», `/privacidad/` v1.7 y `/terminos/`. Pages publica la raíz, no `app/` |
 | URL canónica | `https://listacriolla.app` |
 | Privacy | `https://listacriolla.app/privacidad/` |
 | Contacto | `hola@listacriolla.app` |
@@ -14,13 +13,15 @@ Sitio público de **Lista Criolla** (GitHub Pages + `listacriolla.app`).
 | CNAME | `listacriolla.app` |
 | Package | `app.proyectoorden.listacriolla` |
 
-## Contenido (rama `site/que-hace`)
+## Contenido (`main`)
 
-- **`/`** — Qué hace la app (listas, tareas, calma, local-first), quote del creador, galería con capturas recortadas en `assets/img/screens/site-*.png` (origen store `media/site-2026-11-04/`).
+- **`/`** — Qué hace la app (listas, tareas, calma, local-first), quote del creador, galería con capturas recortadas en `assets/img/screens/site-*.png`.
 - **`/privacidad/`** — Política v1.7 / app 1.0.0; avisos de resumen y vencimiento programados en el teléfono (no se envían a servidores nuestros).
+- **`/terminos/`** — Términos de uso 1.0.0.
 - **Crédito** — Sitio desarrollado por **Esteban Martín** → `https://emartin.com.ar` (footer inicio + privacidad).
+- **CSP** — meta tag en `/`, `/privacidad/` y `/terminos/`: sin scripts ni recursos remotos. `frame-ancestors` no aplica en un meta tag; el header lo tiene que poner el host.
 
-Capturas actualizadas: `assets/img/screens/site-*.png` (store `media/site-2026-11-04/`, ventana recortada). Pendiente merge del PR.
+`app/` (Next, export estático) no entra en el deploy de Pages.
 
 ## Dominios (301)
 
@@ -40,7 +41,7 @@ python3 -m http.server 8080
 
 | Workflow | Cuándo | Qué hace |
 |---|---|---|
-| **CI** | `pull_request` | `static_check.py` (HTML UTF-8, títulos) |
+| **CI** | `pull_request` | `static_check.py` (HTML UTF-8, títulos, CSP) y job `web-app` (Node 22) |
 | **Police Preflight** | push a ramas ≠ `main` (PR abierto) | hygiene, secret scan, static check → comentario en PR |
 | **Police Docs** | push a ramas ≠ `main` (PR abierto) | docs vs cambios en `index.html` / `privacidad/` → comentario en PR |
 
@@ -57,4 +58,4 @@ Archivos listos: `CNAME`, `.nojekyll`, canónicas, `sitemap.xml`, `robots.txt`.
 
 ## Relación con la app
 
-Solo sitio estático. App: `esteban1k/proyecto-orden-mobile` (no se toca desde aquí).
+Pages sirve este sitio estático. La app móvil es `esteban1k/proyecto-orden-mobile`. La app web de cuenta vive en `app/` y no se publica con el sitio de marketing.
