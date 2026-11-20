@@ -1,6 +1,5 @@
-# Police Preflight del sitio estático. No usa Flutter.
-# Sintaxis = HTML UTF-8 con title. Build de comprobación = el propio archivo
-# publicado (index + privacidad). No hay suite unitaria en este repo.
+# Police Preflight — híbrido: marketing estático (perfil web) + Next en app/ (web-next).
+# Kit: esteban1k/proyecto-qa packages/police-kit/workflows/web-next/
 name: Police Preflight
 
 on:
@@ -42,7 +41,7 @@ jobs:
           echo "has_pr=true" >> "$GITHUB_OUTPUT"
           echo "number=$n" >> "$GITHUB_OUTPUT"
 
-      - name: Chequeos
+      - name: Commits del push
         if: steps.pr.outputs.has_pr == 'true'
         run: |
           set -eu
@@ -52,15 +51,108 @@ jobs:
             "${{ github.event.after }}" \
             "origin/${{ github.event.repository.default_branch }}" \
             > "$RUNNER_TEMP/commits.txt"
+
+      - name: Higiene de commits
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
           python3 tool/police/commit_hygiene.py \
             --commits-file "$RUNNER_TEMP/commits.txt" \
             --branch "${GITHUB_REF_NAME}" \
             >> "$RUNNER_TEMP/police-preflight.md"
+
+      - name: Secretos
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
           python3 tool/police/secret_scan.py \
             --commits-file "$RUNNER_TEMP/commits.txt" \
             >> "$RUNNER_TEMP/police-preflight.md"
-          python3 tool/police/static_check.py \
-            >> "$RUNNER_TEMP/police-preflight.md"
+
+      - name: Static site (perfil web)
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
+          python3 tool/police/static_check.py >> "$RUNNER_TEMP/police-preflight.md"
+
+      - name: ¿Toca app/?
+        id: app
+        if: steps.pr.outputs.has_pr == 'true'
+        run: |
+          set -eu
+          touches=false
+          while read -r sha; do
+            [ -z "$sha" ] && continue
+            if git diff-tree --no-commit-id --name-only -r "$sha" | grep -q '^app/'; then
+              touches=true
+              break
+            fi
+          done < "$RUNNER_TEMP/commits.txt"
+          echo "touches=$touches" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node
+        if: steps.pr.outputs.has_pr == 'true' && steps.app.outputs.touches == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: npm ci (app/)
+        if: steps.pr.outputs.has_pr == 'true' && steps.app.outputs.touches == 'true'
+        working-directory: app
+        run: |
+          set +e
+          npm ci > "$RUNNER_TEMP/npm-ci.log" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            {
+              echo "<!-- police:blocker -->"
+              echo "- **blocker** · \`app/\`: \`npm ci\` falló (exit ${code})."
+              echo '```'
+              tail -n 40 "$RUNNER_TEMP/npm-ci.log"
+              echo '```'
+            } >> "$RUNNER_TEMP/police-preflight.md"
+            exit 0
+          fi
+
+      - name: Build (app/)
+        if: steps.pr.outputs.has_pr == 'true' && steps.app.outputs.touches == 'true'
+        working-directory: app
+        run: |
+          set +e
+          npm run build > "$RUNNER_TEMP/build.log" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            {
+              echo "<!-- police:blocker -->"
+              echo "- **blocker** · \`app/\`: \`npm run build\` falló (exit ${code})."
+              echo '```'
+              tail -n 40 "$RUNNER_TEMP/build.log"
+              echo '```'
+            } >> "$RUNNER_TEMP/police-preflight.md"
+          fi
+
+      - name: Lint (app/, si existe)
+        if: steps.pr.outputs.has_pr == 'true' && steps.app.outputs.touches == 'true'
+        working-directory: app
+        run: |
+          if ! node -e "const s=require('./package.json').scripts||{}; process.exit(s.lint?0:1)"; then
+            echo "Sin script lint en app/; omitido."
+            exit 0
+          fi
+          set +e
+          npm run lint > "$RUNNER_TEMP/lint.log" 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            {
+              echo "<!-- police:warning -->"
+              echo "- **warning** · \`app/\`: \`npm run lint\` falló (exit ${code})."
+              echo '```'
+              tail -n 40 "$RUNNER_TEMP/lint.log"
+              echo '```'
+            } >> "$RUNNER_TEMP/police-preflight.md"
+          fi
 
       - name: Comentar en el PR
         if: steps.pr.outputs.has_pr == 'true'

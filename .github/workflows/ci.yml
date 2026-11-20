@@ -13,6 +13,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  web-app:
+    name: Web app (Next)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install and verify
+        run: |
+          npm ci
+          npm audit --audit-level=high
+          npm test
+          npm run lint
+          npm run build
+
   static-site:
     name: Static site
     runs-on: ubuntu-latest
