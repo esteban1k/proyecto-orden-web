@@ -9,6 +9,12 @@ const CODE_TO_MESSAGE: Partial<Record<string, MessageKey>> = {
   session_cap: "errors.session_cap",
   no_database: "errors.no_database",
   network: "errors.network",
+  sync_not_ready: "errors.sync_not_ready",
+  sync_empty: "errors.sync_empty",
+  revision_conflict: "errors.revision_conflict",
+  invalid_envelope: "errors.invalid_envelope",
+  invalid_session: "errors.invalid_session",
+  payload_too_large: "errors.payload_too_large",
 };
 
 export function userFacingError(err: unknown): string {
