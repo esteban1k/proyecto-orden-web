@@ -2,3 +2,10 @@
 *.log
 .idea/
 .vscode/
+
+# Next.js app (excluded from Pages artifact)
+app/node_modules/
+app/.next/
+app/out/
+app/.env
+app/.env.local
