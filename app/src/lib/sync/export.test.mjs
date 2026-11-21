@@ -55,4 +55,27 @@ describe("export sync helpers", () => {
     );
     assert.equal(snapshotHasUserData({ has_data: true, envelope: null }), true);
   });
+
+  it("builds resumen totals and prefs", async () => {
+    const {
+      parseExportDocument,
+      resumenTotals,
+      summaryPrefsFromDoc,
+    } = await import("./export.ts");
+    const doc = parseExportDocument({
+      ...fixture,
+      prefs: {
+        userName: "Ana",
+        dailySummaryEnabled: true,
+        dailySummaryTime: "09:00",
+      },
+    });
+    const totals = resumenTotals(doc);
+    assert.equal(totals.pending, 1);
+    assert.equal(totals.completed, 2);
+    const prefs = summaryPrefsFromDoc(doc);
+    assert.equal(prefs.dailyEnabled, true);
+    assert.equal(prefs.scheduleNote, "09:00");
+    assert.equal(prefs.nickname, "Ana");
+  });
 });

@@ -87,3 +87,13 @@ export async function putSnapshot(
     body: JSON.stringify(body),
   });
 }
+
+export async function wipeSync(
+  sessionToken: string,
+): Promise<{ server_revision?: number }> {
+  return syncFetch("/v1/sync/wipe", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    body: "{}",
+  });
+}

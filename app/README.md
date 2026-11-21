@@ -33,7 +33,9 @@ npm run build  # genera out/
 - `/` → redirige a `/listas/`
 - `/login/` — registro, login, Google (mensaje fijo si OAuth no está)
 - `/verify-email/` — OTP 6 dígitos (en local, el código sale en el log del API)
-- `/listas/` — stub protegido por sesión (M2 sync)
+- `/listas/` — sync real + wizard primer upload (M2)
+- `/resumenes/` — totales y prefs de avisos (lectura del export)
+- `/ajustes/` — sesiones, MCP tokens, wipe sync
 
 ## Sesión, XSS y camino a producción
 

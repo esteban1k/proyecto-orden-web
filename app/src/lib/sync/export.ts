@@ -179,3 +179,52 @@ export function snapshotHasUserData(snap: {
   const ct = snap.envelope?.ciphertext;
   return typeof ct === "string" && ct.length > 0;
 }
+
+export type SummaryPrefsView = {
+  dailyEnabled: boolean | null;
+  weeklyEnabled: boolean | null;
+  scheduleNote: string | null;
+  nickname: string | null;
+};
+
+function readBoolPref(prefs: Record<string, unknown>, key: string): boolean | null {
+  const value = prefs[key];
+  return typeof value === "boolean" ? value : null;
+}
+
+function readStringPref(prefs: Record<string, unknown>, key: string): string | null {
+  const value = prefs[key];
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+/** v1 web: read summary-related prefs from mobile export (display only). */
+export function summaryPrefsFromDoc(doc: ExportDocument): SummaryPrefsView {
+  const prefs = doc.prefs && typeof doc.prefs === "object" ? doc.prefs : {};
+  const record = prefs as Record<string, unknown>;
+  const dailyEnabled = readBoolPref(record, "dailySummaryEnabled");
+  const weeklyEnabled = readBoolPref(record, "weeklySummaryEnabled");
+  const hour =
+    readStringPref(record, "dailySummaryTime") ??
+    readStringPref(record, "summaryTime");
+  const nickname =
+    readStringPref(record, "userName") ?? readStringPref(record, "nickname");
+  let scheduleNote: string | null = null;
+  if (hour) scheduleNote = hour;
+  return { dailyEnabled, weeklyEnabled, scheduleNote, nickname };
+}
+
+export type ResumenTotals = {
+  lists: number;
+  pending: number;
+  completed: number;
+};
+
+export function resumenTotals(doc: ExportDocument): ResumenTotals {
+  let pending = 0;
+  let completed = 0;
+  for (const task of doc.tasks) {
+    if (taskIsCompleted(task)) completed += 1;
+    else pending += 1;
+  }
+  return { lists: doc.lists.length, pending, completed };
+}
