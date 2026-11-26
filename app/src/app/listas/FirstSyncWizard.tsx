@@ -10,7 +10,7 @@ import {
   encodeExportForUpload,
   parseExportJson,
 } from "@/lib/sync/export";
-import { stubSeal } from "@/lib/sync/e2e";
+import { sealForUpload } from "@/lib/sync/envelope";
 import { readSession } from "@/lib/session";
 
 type FirstSyncWizardProps = {
@@ -38,7 +38,11 @@ export function FirstSyncWizard({
       try {
         const doc = parseExportJson(raw);
         const plaintext = encodeExportForUpload(doc);
-        const envelope = stubSeal(plaintext, session.device_id);
+        const envelope = await sealForUpload(
+          plaintext,
+          session.user_id,
+          session.device_id,
+        );
         const res = await putSnapshot(session.session_token, {
           base_revision: serverRevision,
           envelope,
@@ -50,6 +54,8 @@ export function FirstSyncWizard({
       } catch (err) {
         if (err instanceof Error && err.message === "invalid_envelope") {
           setError(t("errors.invalid_envelope"));
+        } else if (err instanceof Error && err.message === "e2e_key_missing") {
+          setError(t("errors.e2e_key_missing"));
         } else {
           setError(userFacingError(err));
         }

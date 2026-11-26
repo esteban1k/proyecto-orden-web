@@ -33,7 +33,10 @@ export default function ResumenesPage() {
     if (!session?.session_token) return;
     setView({ kind: "loading" });
     try {
-      const loaded = await loadSyncedExport(session.session_token);
+      const loaded = await loadSyncedExport(
+        session.session_token,
+        session.user_id,
+      );
       if (loaded.kind === "empty") {
         setView({ kind: "empty" });
         return;
@@ -93,6 +96,10 @@ export default function ResumenesPage() {
                 <PrefRow
                   label={t("resumenes.weekly")}
                   value={formatBool(view.prefs.weeklyEnabled)}
+                />
+                <PrefRow
+                  label={t("resumenes.reminders")}
+                  value={formatBool(view.prefs.remindersMaster)}
                 />
                 {view.prefs.scheduleNote ? (
                   <PrefRow

@@ -183,6 +183,7 @@ export function snapshotHasUserData(snap: {
 export type SummaryPrefsView = {
   dailyEnabled: boolean | null;
   weeklyEnabled: boolean | null;
+  remindersMaster: boolean | null;
   scheduleNote: string | null;
   nickname: string | null;
 };
@@ -203,6 +204,7 @@ export function summaryPrefsFromDoc(doc: ExportDocument): SummaryPrefsView {
   const record = prefs as Record<string, unknown>;
   const dailyEnabled = readBoolPref(record, "dailySummaryEnabled");
   const weeklyEnabled = readBoolPref(record, "weeklySummaryEnabled");
+  const remindersMaster = readBoolPref(record, "remindersMasterEnabled");
   const hour =
     readStringPref(record, "dailySummaryTime") ??
     readStringPref(record, "summaryTime");
@@ -210,7 +212,7 @@ export function summaryPrefsFromDoc(doc: ExportDocument): SummaryPrefsView {
     readStringPref(record, "userName") ?? readStringPref(record, "nickname");
   let scheduleNote: string | null = null;
   if (hour) scheduleNote = hour;
-  return { dailyEnabled, weeklyEnabled, scheduleNote, nickname };
+  return { dailyEnabled, weeklyEnabled, remindersMaster, scheduleNote, nickname };
 }
 
 export type ResumenTotals = {

@@ -11,7 +11,7 @@ import {
   snapshotHasUserData,
   summarizeLists,
 } from "@/lib/sync/export";
-import { stubOpen } from "@/lib/sync/e2e";
+import { openEnvelope } from "@/lib/sync/envelope";
 import type { ListSummary } from "@/lib/sync/types";
 import { FirstSyncWizard } from "./FirstSyncWizard";
 import { ListasPanel } from "./ListasPanel";
@@ -40,7 +40,7 @@ export default function ListasPage() {
         setView({ kind: "error", message: t("errors.sync_empty") });
         return;
       }
-      const plaintext = stubOpen(snap.envelope);
+      const plaintext = await openEnvelope(snap.envelope, session.user_id);
       const doc = parseExportJson(plaintext);
       setView({
         kind: "lists",
@@ -63,7 +63,9 @@ export default function ListasPage() {
         if (!session?.session_token) return;
         try {
           const snap = await getSnapshot(session.session_token);
-          const plaintext = snap.envelope ? stubOpen(snap.envelope) : "";
+          const plaintext = snap.envelope
+            ? await openEnvelope(snap.envelope, session.user_id)
+            : "";
           const doc = parseExportJson(plaintext);
           setView({
             kind: "lists",

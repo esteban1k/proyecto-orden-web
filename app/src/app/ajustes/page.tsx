@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/AuthGuard";
 import { t } from "@/i18n";
+import { fetchMcpPat, rotateMcpPat } from "@/lib/api/mcpPat";
 import { listSessions, revokeSession, type ActiveSessionRow } from "@/lib/api/sessions";
 import { wipeSync } from "@/lib/api/sync";
 import { userFacingError } from "@/lib/errors";
@@ -23,6 +24,7 @@ type ViewState =
       sessions: ActiveSessionRow[];
       cap: number;
       mcpToken: McpApiTokenRecord;
+      mcpPatSource: "server" | "local";
       expiresAt: string;
     };
 
@@ -39,12 +41,20 @@ export default function AjustesPage() {
     setView({ kind: "loading" });
     try {
       const res = await listSessions(session.session_token);
-      const mcpToken = getOrCreateMcpApiToken(session.user_id);
+      const serverPat = await fetchMcpPat(session.session_token);
+      const mcpToken = serverPat
+        ? {
+            user_id: session.user_id,
+            token: serverPat.token,
+            rotated_at: serverPat.rotated_at,
+          }
+        : getOrCreateMcpApiToken(session.user_id);
       setView({
         kind: "ready",
         sessions: res.sessions ?? [],
         cap: res.cap ?? 5,
         mcpToken,
+        mcpPatSource: serverPat ? "server" : "local",
         expiresAt: session.expires_at,
       });
     } catch (err) {
@@ -68,12 +78,39 @@ export default function AjustesPage() {
 
   const onRotateMcpToken = useCallback(() => {
     const session = readSession();
-    if (!session) return;
-    const next = rotateMcpApiToken(session.user_id);
-    setView((prev) =>
-      prev.kind === "ready" ? { ...prev, mcpToken: next } : prev,
-    );
-  }, []);
+    if (!session?.session_token) return;
+    void (async () => {
+      setBusy(true);
+      try {
+        if (view.kind === "ready" && view.mcpPatSource === "server") {
+          const rotated = await rotateMcpPat(session.session_token);
+          setView((prev) =>
+            prev.kind === "ready"
+              ? {
+                  ...prev,
+                  mcpToken: {
+                    user_id: session.user_id,
+                    token: rotated.token,
+                    rotated_at: rotated.rotated_at,
+                  },
+                }
+              : prev,
+          );
+        } else {
+          const next = rotateMcpApiToken(session.user_id);
+          setView((prev) =>
+            prev.kind === "ready"
+              ? { ...prev, mcpToken: next, mcpPatSource: "local" }
+              : prev,
+          );
+        }
+      } catch (err) {
+        setView({ kind: "error", message: userFacingError(err) });
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [view]);
 
   const onRevoke = useCallback(
     async (sessionId: string, isCurrent: boolean) => {
@@ -150,7 +187,11 @@ export default function AjustesPage() {
             </Panel>
 
             <Panel title={t("ajustes.mcpTokenTitle")}>
-              <p className="text-sm text-stone-600">{t("ajustes.mcpTokenHint")}</p>
+              <p className="text-sm text-stone-600">
+                {view.mcpPatSource === "server"
+                  ? t("ajustes.mcpTokenHintServer")
+                  : t("ajustes.mcpTokenHint")}
+              </p>
               <p className="font-mono text-sm text-stone-800">
                 {maskToken(view.mcpToken.token)}
               </p>

@@ -18,6 +18,7 @@ cp .env.example .env
 | `API_PROXY_TARGET` | Destino de `rewrites` solo en `npm run dev`. El build estático no proxifica. http solo loopback. |
 | `NEXT_PUBLIC_API_BASE_URL` | Vacío en dev. Origen https de la API en un build estático, para fijar `connect-src`. |
 | `NEXT_PUBLIC_DEVICE_LABEL` | Etiqueta de dispositivo en register/login |
+| `NEXT_PUBLIC_SYNC_E2E_STUB` | `1` fuerza algorithm `stub` en uploads (solo debug) |
 
 ## Scripts
 
@@ -33,7 +34,7 @@ npm run build  # genera out/
 - `/` → redirige a `/listas/`
 - `/login/` — registro, login, Google (mensaje fijo si OAuth no está)
 - `/verify-email/` — OTP 6 dígitos (en local, el código sale en el log del API)
-- `/listas/` — sync real + wizard primer upload (M2)
+- `/listas/` — sync real + wizard primer upload (M2, cifrado **aes-256-gcm+v1**; stub legacy solo lectura)
 - `/resumenes/` — totales y prefs de avisos (lectura del export)
 - `/ajustes/` — sesiones, MCP tokens, wipe sync
 

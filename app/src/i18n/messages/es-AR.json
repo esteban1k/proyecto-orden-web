@@ -49,6 +49,7 @@
   "resumenes.prefsTitle": "Avisos (desde el móvil)",
   "resumenes.daily": "Resumen diario",
   "resumenes.weekly": "Resumen semanal",
+  "resumenes.reminders": "Recordatorios",
   "resumenes.schedule": "Horario",
   "resumenes.nickname": "Apodo",
   "resumenes.prefsNote": "En la web v1 no programamos notificaciones; los avisos siguen en el teléfono.",
@@ -61,6 +62,7 @@
   "ajustes.mcpSessionHint": "El API acepta hoy este bearer para /mcp/*. Copialo para Cursor u otros clientes.",
   "ajustes.mcpTokenTitle": "Token personal MCP",
   "ajustes.mcpTokenHint": "Token largo rotatable en este navegador (decisiones v1). Cuando el API lo admita, reemplazará al de sesión en clientes de escritorio.",
+  "ajustes.mcpTokenHintServer": "Token persistido en el API (MCP escritorio). Rotar invalida el anterior.",
   "ajustes.copy": "Copiar",
   "ajustes.copied": "Copiado",
   "ajustes.rotateToken": "Rotar token",
@@ -88,6 +90,7 @@
   "errors.invalid_envelope": "El archivo no es un export válido de Lista Criolla.",
   "errors.invalid_session": "Tu sesión venció. Volvé a ingresar.",
   "errors.payload_too_large": "El archivo es demasiado grande para subir.",
+  "errors.e2e_key_missing": "Estos datos fueron cifrados en otro dispositivo. Abrilos desde el mismo equipo o volvé a subir un export.",
   "errors.generic": "Algo salió mal. Intentá de nuevo.",
   "loading": "Cargando…"
 }
