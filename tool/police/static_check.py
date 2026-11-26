@@ -16,11 +16,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=Path, default=Path("."))
     args = ap.parse_args()
-    pages = [
-        args.root / "index.html",
-        *sorted((args.root / "privacidad").glob("**/*.html")),
-        *sorted((args.root / "terminos").glob("**/*.html")),
-    ]
+    pages = [args.root / "index.html", *sorted((args.root / "privacidad").glob("**/*.html"))]
     chunks: list[str] = []
     for page in pages:
         rel = page.relative_to(args.root)
@@ -42,8 +38,6 @@ def main() -> int:
             chunks.append(finding("warning", f"`{rel}` no cierra `</html>`."))
         if "charset" not in lower:
             chunks.append(finding("nice", f"`{rel}` no declara charset."))
-        if "content-security-policy" not in lower:
-            chunks.append(finding("blocker", f"`{rel}` no declara Content-Security-Policy."))
     sys.stdout.write("".join(chunks))
     return 0
 

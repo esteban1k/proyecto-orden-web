@@ -12,4 +12,9 @@ describe("user facing errors", () => {
     assert.equal(text, "Algo salió mal. Intentá de nuevo.");
     assert.equal(userFacingError(new Error(leaked)).includes("onerror"), false);
   });
+
+  it("maps sync error codes to es-AR copy", () => {
+    assert.match(userFacingError(new ApiError(501, "sync_not_ready")), /API M2/);
+    assert.match(userFacingError(new ApiError(409, "revision_conflict")), /Recargá/);
+  });
 });

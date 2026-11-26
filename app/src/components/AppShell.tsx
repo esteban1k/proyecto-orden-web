@@ -51,6 +51,30 @@ export function AppShell({ children }: AppShellProps) {
               {t("nav.listas")}
             </Link>
             {loggedIn ? (
+              <>
+                <Link
+                  href="/resumenes/"
+                  className={
+                    pathname?.startsWith("/resumenes")
+                      ? "font-medium text-emerald-800"
+                      : "text-stone-600 hover:text-stone-900"
+                  }
+                >
+                  {t("nav.resumenes")}
+                </Link>
+                <Link
+                  href="/ajustes/"
+                  className={
+                    pathname?.startsWith("/ajustes")
+                      ? "font-medium text-emerald-800"
+                      : "text-stone-600 hover:text-stone-900"
+                  }
+                >
+                  {t("nav.ajustes")}
+                </Link>
+              </>
+            ) : null}
+            {loggedIn ? (
               <button
                 type="button"
                 onClick={() => void handleLogout()}

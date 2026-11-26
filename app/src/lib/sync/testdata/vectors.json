@@ -1,0 +1,8 @@
+{
+  "algorithm": "aes-256-gcm+v1",
+  "key_id": "test-vector-1",
+  "key_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+  "plaintext": "{\"format\":\"proyecto-orden-export\",\"version\":1,\"lists\":[]}",
+  "nonce_b64": "AAAAAAAAAAAAAAAA",
+  "ciphertext_b64": "dZ7TscdB4skqkotFakPo/LE3OX5H8wRK7rPW+7WQLyJsc8TKT4DLb1ytU8/w4ksiwHQ1lVtLHfgtNfQQTufMLRLsIMbxFy5tZQ=="
+}

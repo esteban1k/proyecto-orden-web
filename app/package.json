@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/lib/api/client.test.mjs src/lib/session.test.mjs src/lib/urlSafety.test.mjs src/lib/csp.test.mjs src/lib/proxyTarget.test.mjs src/lib/errors.test.mjs"
+    "test": "node --import tsx --test src/lib/api/client.test.mjs src/lib/api/sync.test.mjs src/lib/api/sessions.test.mjs src/lib/api/mcpPat.test.mjs src/lib/session.test.mjs src/lib/urlSafety.test.mjs src/lib/csp.test.mjs src/lib/proxyTarget.test.mjs src/lib/errors.test.mjs src/lib/sync/export.test.mjs src/lib/sync/e2e.test.mjs src/lib/sync/aesgcm.test.mjs src/lib/sync/sync.flow.test.mjs src/lib/mcpApiToken.test.mjs"
   },
   "engines": {
     "node": ">=22"
